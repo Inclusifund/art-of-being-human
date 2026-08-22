@@ -272,11 +272,38 @@
     // Image sits over the tint gradient. Until the real photograph lands the
     // gradient carries the chapter on its own — a missing file degrades to a
     // colour field rather than a broken frame.
+    // The URL is parked in data-src, NOT background-image.
+    //
+    // WHY: every layer is built up-front, so setting background-image here made
+    // the browser request all 23 photographs at once. The hero then queued
+    // behind 28 competing downloads — measured at 1.6Mbps / 150ms RTT, the
+    // opening image took 27.8 SECONDS to appear, and until it did the page was
+    // a brown gradient. On a phone that reads as broken, not as slow.
+    // hydrate() below attaches the image only for the chapters in view.
     el.innerHTML = `<div class="ch-img" role="img" aria-label="${esc(ch.alt)}"
-        style="background-image:url('${ch.img}');background-position:${esc(ch.pos)}"></div><div class="ch-veil"></div>`;
+        data-src="${esc(ch.img)}"
+        style="background-position:${esc(ch.pos)}"></div><div class="ch-veil"></div>`;
     stage.appendChild(el);
     return el;
   });
+
+  /** Attach photographs for the chapters within reach of `centre`, and drop
+   *  the ones far behind so a long scroll doesn't hold 23 decoded bitmaps.
+   *  AHEAD is deliberately larger than BEHIND: reading is forward motion. */
+  const AHEAD = 2, BEHIND = 1;
+  function hydrate(centre) {
+    layers.forEach((el, i) => {
+      const img = el.firstElementChild;
+      if (!img) return;
+      const want = i >= centre - BEHIND && i <= centre + AHEAD;
+      if (want && !img.style.backgroundImage) {
+        img.style.backgroundImage = `url('${img.dataset.src}')`;
+      } else if (!want && img.style.backgroundImage && i < centre - BEHIND - 2) {
+        img.style.backgroundImage = '';   // far behind — let the tint carry it again
+      }
+    });
+  }
+  hydrate(0);   // hero first, alone, so it lands immediately
 
   const copyWrap = document.createElement('div');
   copyWrap.className = 'ch-copy-wrap';
@@ -386,6 +413,7 @@
         // arrive together instead of the copy leading the picture.
         : clamp01(1 - (ch.start - rendered) * 2.2);   // upcoming: fades in on top
       const el = layers[i];
+      if (op > 0.005) hydrate(i);   // a scene about to be seen gets its picture
       el.style.opacity = op.toFixed(3);
       // Anything fully covered by a solid layer above it stops compositing
       el.style.visibility = (op < 0.005 || i < topSolid) ? 'hidden' : 'visible';

@@ -1,0 +1,460 @@
+/* ============================================================
+   The Art of Being Human — chapter engine
+   Forked from projects/manifesto-2026-04-19/receipts.js
+
+   Same architecture as Receipts: fixed stage, body scroll mapped to a
+   float `progress`, eased render loop, Calm Kit motion respect, rail nav,
+   static fallback. The canvas circle maths is gone — chapters are DOM
+   layers that cross-dissolve, which keeps photographic quality intact and
+   lets the GPU composite it.
+
+   BEATS, not slides. A chapter owns an image; a beat owns a screen of copy.
+   The sea chapter runs three beats over one seascape — sail, then moonrise,
+   then the night beat — because the direction doc is explicit that these are
+   "moments within the sea story", not chapters of their own.
+
+   Pacing note: every rate here is deliberately slow. The brief asks for an
+   exhale, and an exhale cannot be rushed by an easing curve.
+   ============================================================ */
+
+(() => {
+
+  // Chapter copy is VERBATIM from the client's WEB DIRECTION CREATION.md.
+  // The doc's Golden Rule — "whenever we are tempted to add more text: REMOVE IT"
+  // — is the acceptance criterion for this file. Do not pad these lines.
+  const CHAPTERS = [
+    {
+      num: '01', id: 'invitation', label: 'The Invitation',
+      img: 'img/01-invitation.jpg',
+      alt: 'A lone figure in a vast landscape where desert meets sea at first light',
+      tint: ['#E8DCC8', '#A89880', '#6B5844'],
+      beats: [{
+        title: 'The Art of Being Human',
+        meta: 'Egypt · November 18–28',
+        lines: ['Ten days to step outside the familiar.', 'To breathe.', 'To feel.', 'To remember.'],
+        cta: { label: 'Enter', href: '#ch-egypt' },
+        opening: true,
+      }],
+    },
+    {
+      num: '02', id: 'anicca', label: 'Impermanence',
+      img: 'img/02a-nothing-stays.jpg',
+      alt: 'Moving water, its surface pulled into long soft streaks',
+      tint: ['#C9D3D6', '#6E7E86', '#212B31'],
+      beats: [{
+        title: 'Nothing stays.',
+        lines: ['To be human is to live in a world', 'that is always changing.'],
+        soft: ['The desert changes with the light.', 'The moon moves through its cycle.',
+               'The tide comes and goes.', 'The body changes.',
+               'Relationships change.', 'We change.'],
+      }, {
+        img: 'img/02b-anicca.jpg',
+        pos: 'center 30%',
+        alt: 'A full moon half-veiled by cloud over dark water',
+        title: 'Anicca',
+        meta: 'Impermanence',
+        lines: ['Not as an idea to understand,', 'but as something to experience.'],
+        soft: ['An invitation to meet change', 'rather than resist it.'],
+      }, {
+        img: 'img/02c-everything-alive.jpg',
+        alt: 'A hand open underwater, reaching up toward the light',
+        lines: ['Nothing is fixed.', 'Nothing is promised.', 'Everything is alive.'],
+      }],
+    },
+    {
+      num: '03', id: 'egypt', label: 'Egypt',
+      img: 'img/02-egypt.jpg',
+      alt: 'Ancient stone in raking Egyptian light, texture and shadow',
+      tint: ['#E3A857', '#A8763F', '#4A3320'],
+      beats: [{
+        title: 'Why Egypt?',
+        lines: ['Some places you visit.', 'Some places you feel.', 'Egypt is one of them.'],
+        soft: ['Ancient. Alive. Contrasting.', 'Impossible to explain completely.'],
+      }, {
+        img: 'img/02b-stone-and-water.jpg',
+        alt: 'Clear shallow water against bare mountains — stone meeting sea',
+        lines: ['Stone and water.', 'Desert and sea.', 'Past and present.'],
+        soft: ['We begin here.'],
+      }],
+    },
+    {
+      num: '04', id: 'desert', label: 'The Desert',
+      img: 'img/03-desert.jpg',
+      alt: 'Sinai mountains and open sand, immense and empty',
+      tint: ['#D9B99B', '#9C7550', '#3E2C1E'],
+      beats: [{
+        title: 'Into the Desert',
+        lines: ['The world becomes quieter.'],
+        soft: ['We walk.', 'We sleep in a cave.', 'We gather around the fire.'],
+      }, {
+        img: 'img/03b-strip-away.jpg',
+        alt: 'A lone acacia against the sun, low mountains behind it',
+        lines: ['We let the desert do what it does.', "Strip away what isn't necessary."],
+      }, {
+        lines: ['Nothing to prove.', 'Nowhere to rush.', 'Just here.'],
+      }],
+    },
+    {
+      num: '05', id: 'inward', label: 'The Inner Journey',
+      img: 'img/04-inner-journey.jpg',
+      alt: 'Firelight on skin and hands, eyes closed, deliberately anonymous',
+      tint: ['#C4622D', '#7A3418', '#20140C'],
+      beats: [{
+        title: 'And then, we go inward.',
+        // Mehta's wording, given in writing 22 Aug 23:07. It replaces a phrase that
+        // gets a WeTravel/Stripe account suspended; the superseded wording lives in
+        // the project record, never in public source. Keep in sync with index.html.
+        soft: ['Movement.', 'Ceremony.', 'Nature\u2019s medicine.', 'Silence.'],
+      }, {
+        lines: ['Whatever is ready to be met,', 'we meet.'],
+        soft: ['Nothing to force.', 'Nothing to perform.', 'Just space.'],
+      }],
+    },
+    {
+      num: '06', id: 'integration', label: 'Integration',
+      img: 'img/05-integration.jpg',
+      alt: 'Steam, flowers on water and worn stone at the temazcal',
+      tint: ['#B2C9C4', '#5E8079', '#1C2E2C'],
+      beats: [{
+        title: 'Return to the body.',
+        lines: ['At Malakot,', 'we soften.'],
+        soft: ['We rebirth in the temazcal, the mother’s womb.'],
+      }, {
+        img: 'img/05b-flowers.jpg',
+        alt: 'Flowers floating on still water at the temazcal',
+        soft: ['Heat.', 'Cold.', 'Water.', 'Flowers.', 'Fire.', 'Breath.'],
+      }, {
+        lines: ['We let the experience settle.', 'We integrate.', 'We come back.'],
+      }],
+    },
+    {
+      num: '07', id: 'sea', label: 'The Sea',
+      img: 'img/06-sea.jpg',
+      alt: 'The open Red Sea from the deck, turquoise water to the horizon',
+      tint: ['#5DB6C4', '#1B4A5A', '#0A1F2A'],
+      beats: [{
+        title: 'Then, the land disappears.',
+        lines: ['The Red Sea opens.'],
+        soft: ['We sail.', 'We swim.', 'We float.', 'We laugh.', 'We rest.'],
+      }, {
+        lines: ['And somewhere between the water and the sky,', 'time begins to disappear.'],
+      }, {
+        img: 'img/06b-full-moon.jpg',
+        pos: 'center 22%',
+        alt: 'A full moon over open sea, its light broken across the water',
+        title: 'The full moon rises.',
+        lines: ['We turn inward again.', 'We listen to what lies beneath the story we know.'],
+        soft: ['Then we look forward.', 'What do we want to create?'],
+      }, {
+        // A named substance was removed from this beat on 22 Aug at Mehta's written
+        // instruction (she is unsure it will be offered). The night beat stays; only
+        // the naming goes. One image in img/ is now unused as a result.
+        soft: ['Night comes.', 'Stillness.', 'Water.', 'Breath.'],
+      }],
+    },
+    {
+      num: '08', id: 'sunrise', label: 'The Last Sunrise',
+      img: 'img/07-last-sunrise.jpg',
+      alt: 'Sunrise over the Red Sea, bodies moving on deck in first light',
+      tint: ['#F2B45C', '#D4692E', '#3A1C10'],
+      beats: [{
+        title: 'And then, sunrise.',
+        lines: ['Our last morning at sea.'],
+        soft: ['Cacao.', 'Fresh fruit.', 'Music.', 'The first light.'],
+      }, {
+        img: 'img/07b-we-dance.jpg',
+        alt: 'Raised hands in silhouette against a burning sunrise sky',
+        lines: ['And we dance.'],
+        soft: ['Not because we have somewhere to go.', 'But because we are here.', 'Alive.', 'Together.'],
+      }, {
+        title: 'An exhale.',
+        climax: true,
+      }],
+    },
+    {
+      num: '09', id: 'circle', label: 'The Human Circle',
+      img: 'img/08-human-circle.jpg',
+      alt: 'The group together, unposed — laughing, resting, leaning in',
+      tint: ['#E0C9AE', '#96725A', '#2E211A'],
+      beats: [{
+        title: 'For all of us.',
+        soft: ['All genders.', 'All orientations.', 'All identities.', 'All ways of being.'],
+      }, {
+        lines: ['There is no particular way you need to be to belong here.', 'Come as you are.'],
+        soft: ['Different stories.', 'Different bodies.', 'Different lives.', 'One human circle.'],
+      }, {
+        title: 'We are all just being human.',
+        climax: true,
+      }],
+    },
+    {
+      num: '10', id: 'story', label: 'The Story',
+      img: 'img/09-the-story.jpg',
+      alt: 'An unposed, personal portrait of Mehta',
+      tint: ['#D6BFA8', '#8A6A52', '#2A1D15'],
+      beats: [{
+        title: 'How this began',
+        lines: ['This is not something I invented.', 'It is something I have lived.'],
+        soft: ['A story about Egypt. Travel. The body. Movement.',
+               'Connection. Women. Human. Culture.',
+               'And the questions that keep bringing me deeper into what it means to be human.'],
+        ctas: [{ label: 'Meet Mehta', href: 'mehta.html' },
+               { label: 'Meet Doryan', href: 'doryan.html' }],
+      }],
+    },
+    {
+      num: '11', id: 'come', label: 'Come With Us',
+      img: 'img/10-come-with-us.jpg',
+      alt: 'A tiny figure walking away into an immense open landscape',
+      tint: ['#EBD9C0', '#7E93A0', '#16222B'],
+      beats: [{
+        title: 'Maybe this is your time.',
+        soft: ['To step away.', 'To breathe.', 'To feel.', 'To remember.'],
+      }, {
+        soft: ['Ten days.', 'Desert.', 'Sea.', 'Fire.', 'Water.', 'Moonlight.', 'Sunrise.'],
+        lines: ['To love what is here', 'without needing it to stay.'],
+      }, {
+        title: 'The Art of Being Human',
+        meta: 'Egypt · November 18–28, 2026',
+        cta: { label: 'Come with us', href: '#enquire', primary: true },
+        closing: true,
+      }],
+    },
+  ];
+
+  // ---- Flatten chapters → beats, and record each chapter's beat span ----
+  const BEATS = [];
+  CHAPTERS.forEach((ch, ci) => {
+    ch.start = BEATS.length;
+    ch.beats.forEach((b) => BEATS.push({ ...b, chapter: ch, chapterIndex: ci }));
+    ch.end = BEATS.length - 1;
+  });
+  const totalBeats = BEATS.length;
+
+  // A chapter is a unit of NARRATIVE; a scene is a unit of PICTURE. They used to
+  // be the same thing, which meant the sea chapter showed one dolphin frame
+  // through its moonrise and blue-lotus beats. Beats may now carry their own
+  // `img`, and consecutive beats sharing a frame collapse back into one scene —
+  // so an unchanged chapter still costs exactly one layer, as before.
+  const SCENES = [];
+  BEATS.forEach((b, i) => {
+    const img = b.img || b.chapter.img;
+    const prev = SCENES[SCENES.length - 1];
+    if (prev && prev.img === img) { prev.end = i; return; }
+    SCENES.push({
+      img,
+      // Portrait frames cover-crop hard on a landscape viewport; `pos` keeps the
+      // subject (the moon, a horizon) inside the crop instead of centring blindly.
+      pos: b.pos || b.chapter.pos || 'center',
+      alt: b.alt || b.chapter.alt,
+      tint: b.chapter.tint,
+      // Only the chapter's opening scene carries the anchor id the [ENTER] cta targets
+      id: i === b.chapter.start ? b.chapter.id : null,
+      start: i, end: i,
+    });
+  });
+
+  const stage = document.getElementById('stage');
+  const railEl = document.getElementById('rail');
+  if (!stage) return;
+
+  // ---- Build the DOM ----
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  const layers = SCENES.map((ch) => {
+    const el = document.createElement('div');
+    el.className = 'ch-layer';
+    if (ch.id) el.id = 'ch-' + ch.id;
+    el.style.setProperty('--tint-1', ch.tint[0]);
+    el.style.setProperty('--tint-2', ch.tint[1]);
+    el.style.setProperty('--tint-3', ch.tint[2]);
+    // Image sits over the tint gradient. Until the real photograph lands the
+    // gradient carries the chapter on its own — a missing file degrades to a
+    // colour field rather than a broken frame.
+    el.innerHTML = `<div class="ch-img" role="img" aria-label="${esc(ch.alt)}"
+        style="background-image:url('${ch.img}');background-position:${esc(ch.pos)}"></div><div class="ch-veil"></div>`;
+    stage.appendChild(el);
+    return el;
+  });
+
+  const copyWrap = document.createElement('div');
+  copyWrap.className = 'ch-copy-wrap';
+  stage.appendChild(copyWrap);
+
+  const copies = BEATS.map((b, i) => {
+    const el = document.createElement('div');
+    el.className = 'ch-copy'
+      + (b.opening ? ' is-opening' : '') + (b.closing ? ' is-closing' : '')
+      + (b.climax ? ' is-climax' : '');
+    const parts = [];
+    if (i === b.chapter.start) {
+      parts.push(`<p class="ch-num">${b.chapter.num} — ${esc(b.chapter.label)}</p>`);
+    }
+    if (b.title) parts.push(`<h2 class="ch-title">${esc(b.title)}</h2>`);
+    if (b.meta) parts.push(`<p class="ch-meta">${esc(b.meta)}</p>`);
+    if (b.lines) parts.push(`<p class="ch-lines">${b.lines.map(esc).join('<br />')}</p>`);
+    if (b.soft) parts.push(`<p class="ch-soft">${b.soft.map(esc).join('<br />')}</p>`);
+    // A beat may carry one cta or several — the hosts beat offers two doors,
+    // per the direction doc's "Meet Mehta -> and Meet Doryan ->".
+    const ctas = b.ctas || (b.cta ? [b.cta] : []);
+    ctas.forEach((c) => parts.push(
+      `<a class="ch-cta${c.primary ? ' is-primary' : ''}" href="${esc(c.href)}">${esc(c.label)}</a>`));
+    el.innerHTML = parts.join('\n');
+    copyWrap.appendChild(el);
+    return el;
+  });
+
+  // Rail — one dot per chapter, not per beat
+  CHAPTERS.forEach((ch, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'rail-dot';
+    b.dataset.chapter = i;
+    b.setAttribute('aria-label', `Chapter ${ch.num} — ${ch.label}`);
+    b.innerHTML = `<span class="rail-label">${ch.num} ${esc(ch.label)}</span>`;
+    b.addEventListener('click', () => scrollToBeat(ch.start));
+    railEl.appendChild(b);
+  });
+  const railDots = railEl.querySelectorAll('.rail-dot');
+
+  // Scroll driver height — one screen per beat
+  const scroller = document.getElementById('scroll-driver');
+  scroller.style.height = `${totalBeats * 100}vh`;
+
+  // ---- Scroll → progress ----
+  let progress = 0, rendered = 0, running = true, lastChapter = -1;
+
+  // Beat progress is measured against the DRIVER, not the document.
+  //
+  // It used to divide by full document height, which silently coupled the beat
+  // mapping to everything below the journey: adding the Practical and Come With
+  // Us sections stretched the same scroll across a taller page, so the final
+  // chapter only landed once the reader had scrolled past all of it. Measuring
+  // the driver's own box keeps the journey exactly one screen per beat however
+  // much page follows it.
+  const driverRange = () => Math.max(0, scroller.offsetHeight - window.innerHeight);
+  const scrollY = () => window.scrollY || document.documentElement.scrollTop || 0;
+  const onScroll = () => {
+    const h = driverRange();
+    const t = h > 0 ? Math.min(1, Math.max(0, scrollY() / h)) : 0;
+    progress = t * (totalBeats - 1);
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  onScroll();
+
+  function scrollToBeat(idx) {
+    window.scrollTo({ top: (idx / (totalBeats - 1)) * driverRange(), behavior: 'smooth' });
+  }
+
+  const getMotion = () => {
+    const h = document.documentElement;
+    if (h.classList.contains('ck-motion-off')) return 'off';
+    if (h.classList.contains('ck-motion-low')) return 'low';
+    return 'full';
+  };
+  let motion = getMotion();
+
+  const clamp01 = (v) => v < 0 ? 0 : v > 1 ? 1 : v;
+
+  // ---- Render ----
+  const frame = () => {
+    if (!running) return;
+    motion = getMotion();
+    if (motion === 'off') { requestAnimationFrame(frame); return; }
+
+    // Slow on purpose. 0.055 reads as drift; anything near 0.2 reads as a slideshow.
+    rendered += (progress - rendered) * (motion === 'low' ? 0.10 : 0.055);
+
+    // --- Chapter image layers ---
+    // Symmetric fading (both layers at ~0.5 mid-transition) double-exposed the
+    // two photographs into mud. Layers are DOM siblings, so a later chapter
+    // already paints above an earlier one: hold the outgoing frame fully opaque
+    // and fade the incoming one down over the top of it. One image is always
+    // solid, so a transition reads as a dissolve rather than a blend.
+    let topSolid = 0;
+    SCENES.forEach((ch, i) => {
+      if (rendered >= ch.start) topSolid = i;
+    });
+    SCENES.forEach((ch, i) => {
+      const op = rendered >= ch.start
+        ? 1                                          // current, or passed and covered
+        // x2.2 compresses the dissolve into the last ~45% of the beat gap
+        // (at 1x, two photographs sat blended for a full screen of scrolling)
+        // and MATCHES the copy rate below, so a chapter's words and its image
+        // arrive together instead of the copy leading the picture.
+        : clamp01(1 - (ch.start - rendered) * 2.2);   // upcoming: fades in on top
+      const el = layers[i];
+      el.style.opacity = op.toFixed(3);
+      // Anything fully covered by a solid layer above it stops compositing
+      el.style.visibility = (op < 0.005 || i < topSolid) ? 'hidden' : 'visible';
+      if (op > 0.005 && i >= topSolid && motion === 'full') {
+        // Ken Burns: a slow push across the chapter's own span, never a zoom-out
+        const span = Math.max(1, ch.end - ch.start + 1);
+        const local = clamp01((rendered - ch.start + 0.5) / span);
+        el.querySelector('.ch-img').style.transform =
+          `scale(${(1.05 + local * 0.05).toFixed(4)}) translate3d(0, ${(local * -1.4).toFixed(2)}%, 0)`;
+      }
+    });
+
+    // --- Beat copy: tighter cross-fade with a small parallax lift ---
+    copies.forEach((el, i) => {
+      const d = Math.abs(rendered - i);
+      const op = clamp01(1 - d * 2.2);   // matches the image dissolve rate above
+      el.style.opacity = op.toFixed(3);
+      el.style.visibility = op < 0.005 ? 'hidden' : 'visible';
+      if (op > 0.005) {
+        el.style.transform = `translate3d(0, ${((rendered - i) * -2.2).toFixed(2)}rem, 0)`;
+      }
+    });
+
+    // --- Rail + document state ---
+    const nearest = BEATS[Math.max(0, Math.min(totalBeats - 1, Math.round(rendered)))];
+    if (nearest.chapterIndex !== lastChapter) {
+      lastChapter = nearest.chapterIndex;
+      railDots.forEach((d, i) => d.classList.toggle('is-active', i === lastChapter));
+      document.body.dataset.chapter = CHAPTERS[lastChapter].id;
+      const c = document.getElementById('counter');
+      if (c) c.textContent = `${CHAPTERS[lastChapter].num} / ${CHAPTERS[CHAPTERS.length - 1].num}`;
+    }
+
+    // Scroll cue retires once they've started
+    document.body.classList.toggle('has-moved', rendered > 0.25);
+
+    requestAnimationFrame(frame);
+  };
+
+  // ---- Keyboard: arrows step one BEAT, so the sea's moonrise is reachable ----
+  document.addEventListener('keydown', (e) => {
+    const cur = Math.round(rendered);
+    if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+      e.preventDefault(); scrollToBeat(Math.min(totalBeats - 1, cur + 1));
+    } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+      e.preventDefault(); scrollToBeat(Math.max(0, cur - 1));
+    } else if (e.key === 'Home') { e.preventDefault(); scrollToBeat(0); }
+    else if (e.key === 'End')  { e.preventDefault(); scrollToBeat(totalBeats - 1); }
+  });
+
+  // In-page anchors (the [ENTER] cta) must move the scroll driver, not jump the DOM
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[href^="#ch-"]');
+    if (!a) return;
+    const ch = CHAPTERS.find((c) => 'ch-' + c.id === a.getAttribute('href'));
+    if (ch) { e.preventDefault(); scrollToBeat(ch.start); }
+  });
+
+  const boot = () => {
+    motion = getMotion();
+    onScroll();
+    rendered = progress;
+    if (motion !== 'off') frame();
+  };
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(boot); else boot();
+
+  document.addEventListener('calm-kit-change', () => {
+    motion = getMotion();
+    if (motion !== 'off' && !running) { running = true; frame(); }
+  });
+
+})();

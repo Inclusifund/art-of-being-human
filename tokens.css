@@ -1,0 +1,104 @@
+/* ============================================================
+   The Art of Being Human — shared design tokens
+   Palette per the brief: sand · stone · sun · deep water · night ·
+   fire · skin · earth. Warm, tactile, luxurious but never glossy.
+
+   Every page links this FIRST. It exists so the retreat scroll, Mehta's
+   page and the practical pages cannot drift into three different sites.
+   ============================================================ */
+
+:root {
+  --sand:        #E8DCC8;
+  --sand-pale:   #F4EDE1;
+  --stone:       #A89880;
+  --skin:        #D9B99B;
+  --earth:       #6B5844;
+  --ink:         #2A2118;
+  --night:       #141C24;
+  --water:       #1B4A5A;
+  --water-deep:  #0D2A35;
+  --fire:        #C4622D;
+  --sun:         #E3A857;
+
+  /* ---- Page grounds (set 22 Aug 2026) --------------------------------
+     Mehta, in writing: "I asked a sand color background not brown."
+     Doryan, agreeing:  "For sure sand color, that's way too deep brown."
+     So the READING surfaces are sand with ink type; the photographic
+     panels stay dark and full-bleed. The book alternates spread by
+     spread — image, then paper — instead of being uniformly dark.
+     --paper-edge is the colour every hero fades down into. */
+  --paper:       #F0E7D8;
+  --paper-warm:  #E8DCC8;
+  --paper-edge:  #F0E7D8;
+  --ink-soft:    rgba(42, 33, 24, .82);
+  --ink-faint:   rgba(42, 33, 24, .58);
+  --rule:        rgba(42, 33, 24, .16);
+
+  --type-display: "Fraunces", "Canela", Georgia, serif;
+  --type-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Calm Kit hooks */
+  --ck-text-scale: 1;
+  --ck-line-height-mul: 1;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { background: var(--ink); }
+
+body {
+  font-family: var(--type-sans);
+  font-weight: 300;
+  color: var(--sand-pale);
+  background: var(--ink);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.skip-link {
+  position: absolute; top: -100px; left: 1rem; z-index: 1000;
+  background: var(--sand-pale); color: var(--ink);
+  padding: .75rem 1rem; text-decoration: none; border-radius: 3px; font-size: .9rem;
+}
+.skip-link:focus { top: 1rem; }
+
+
+/* ============================================================
+   Calm Kit placement + palette overrides — SHARED, every page
+
+   These live here rather than in retreat.css because they are corrections to
+   the kit itself, not to any one page. Mehta's page linked only tokens.css and
+   mehta.css and immediately got the terracotta FAB back — which is exactly the
+   drift this file exists to stop. The kit's own files stay untouched.
+   ============================================================ */
+
+/* The kit centres its tab on the right edge, which is where the chapter
+   rail lives on the retreat scroll. */
+#calm-kit .ck-tab {
+  align-self: flex-end;
+  margin-bottom: clamp(1.25rem, 5vh, 3.5rem);
+}
+
+/* On mobile the tab becomes a 52px disc coloured by the kit's --terracotta
+   fallback (#C45A3D). On a site briefed to "never scream luxury" and hold very
+   little visual clutter, a saturated orange dot on every frame is the loudest
+   thing on screen. Same restraint as the desktop tab, in palette. */
+@media (max-width: 768px) {
+  #calm-kit .ck-tab {
+    margin-bottom: 0;
+    background: rgba(20, 15, 10, .5);
+    color: var(--sand-pale);
+    border: 1px solid rgba(244, 237, 225, .32);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  #calm-kit .ck-tab:hover { background: rgba(20, 15, 10, .68); }
+  #calm-kit .ck-dismiss {
+    background: rgba(20, 15, 10, .72);
+    border: 1px solid rgba(244, 237, 225, .28);
+    color: var(--sand-pale);
+  }
+  #calm-kit .ck-dismiss:hover { background: rgba(20, 15, 10, .9); }
+}

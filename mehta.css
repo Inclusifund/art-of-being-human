@@ -1,0 +1,322 @@
+/* ============================================================
+   Mehta — personal page
+   Links tokens.css first; this file only adds her page.
+
+   WHY THIS IS NOT THE CHAPTER ENGINE
+   The retreat scroll is a fixed stage driven by a float `progress`. It is
+   built for sparse poetic fragments — four words on a photograph. Her page
+   is prose: "I am a profound lover of life — and of the way life feels when
+   you are truly inside it." Forcing paragraphs into beats would fight the
+   engine and, worse, would make adding a new chapter a JS edit.
+
+   Her brief asks for the opposite: "the architecture should allow new
+   material to be added naturally over time." So her page is document flow —
+   full-height panels with proximity snap. It reads as turning pages, and a
+   new chapter is one <section>, no JavaScript involved.
+   ============================================================ */
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body.m-body {
+  background: var(--paper);
+  /* proximity, never mandatory: a prose panel taller than the viewport must
+     stay freely scrollable rather than fighting the snap back to its top */
+  scroll-snap-type: y proximity;
+}
+body.m-body.ck-motion-off, body.m-body.ck-motion-low { scroll-snap-type: none; }
+
+.m-panel {
+  position: relative;
+  min-height: 100svh;
+  scroll-snap-align: start;
+  display: grid;
+  align-items: center;
+  padding: clamp(3.5rem, 10vh, 8rem) clamp(1.5rem, 7vw, 7rem);
+}
+
+/* ---------- Full-bleed image panels ---------- */
+.m-frame { color: var(--sand-pale); }
+.m-frame > .m-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background-size: cover; background-position: center;
+}
+/* Directional veil — the coffee-table "facing page". Copy sits left, so the
+   frame is held dark on the left and allowed to open up on the right. Floating
+   body prose over the middle of a busy photograph (the mezze spread, the reef)
+   is the one thing this layout cannot carry, and no amount of shadow fixes it. */
+.m-frame > .m-bg::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to right,
+    rgba(16,12,8,.88) 0%, rgba(16,12,8,.72) 30%,
+    rgba(16,12,8,.34) 58%, rgba(16,12,8,.20) 78%, rgba(16,12,8,.40) 100%);
+}
+/* Centred panels get no side to hide behind, so they keep a symmetric veil. */
+.m-frame.is-centred > .m-bg::after {
+  background: linear-gradient(to top,
+    rgba(16,12,8,.72) 0%, rgba(16,12,8,.46) 45%,
+    rgba(16,12,8,.30) 72%, rgba(16,12,8,.46) 100%);
+}
+.m-frame > .m-inner { position: relative; z-index: 1; }
+.m-frame .m-p    { color: rgba(244, 237, 225, .90); }
+.m-frame .m-frag { color: rgba(244, 237, 225, .86); }
+
+/* Same lock as the chapter engine: the scrim travels with the COPY, not the
+   image, so a panel stays readable over the mezze spread and the coral reef
+   as well as over open desert. `closest-side` pins the clear stop to the
+   nearest edge — a percentage-sized gradient gets clipped and shows as a box. */
+.m-frame > .m-inner::before {
+  content: '';
+  position: absolute;
+  inset: -3.5rem -6rem;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse closest-side at 38% 50%,
+    rgba(16, 12, 8, .80) 0%, rgba(16, 12, 8, .66) 40%,
+    rgba(16, 12, 8, .30) 70%, rgba(16, 12, 8, 0) 100%);
+}
+.m-frame > .m-inner.is-centre::before {
+  background: radial-gradient(ellipse closest-side at 50% 50%,
+    rgba(16, 12, 8, .74) 0%, rgba(16, 12, 8, .58) 44%,
+    rgba(16, 12, 8, .24) 72%, rgba(16, 12, 8, 0) 100%);
+}
+
+/* ---------- Reading panels ---------- */
+/* Reading panels are PAPER, not night — the sand ground Mehta and Doryan
+   both asked for on 22 Aug. Type flips to ink so contrast survives the flip
+   (ink #2A2118 on paper #F0E7D8 is ~11.4:1, comfortably past WCAG AAA). */
+.m-read { background: var(--paper); color: var(--ink); }
+.m-read.is-night { background: var(--paper-warm); color: var(--ink); }
+.m-read.is-deep  { background: var(--paper-warm); color: var(--ink); }
+
+.m-inner { max-width: min(46rem, 100%); }
+.m-inner.is-wide   { max-width: min(58rem, 100%); }
+.m-inner.is-centre { max-width: min(38rem, 100%); margin-inline: auto; text-align: center; }
+
+/* An unfilled portrait slot carries its own label at the foot of the panel, so
+   the copy moves up out of its way. The hero keeps its centred copy — the note
+   sits well below it there. Delete `has-slot` when the photograph lands. */
+.m-panel.has-slot { align-items: start; }
+.m-panel.has-slot.is-hero { align-items: center; }
+
+/* ---------- Type ---------- */
+.m-kicker {
+  font-size: calc(clamp(.66rem, 1.4vw, .78rem) * var(--ck-text-scale));
+  letter-spacing: .34em; text-transform: uppercase;
+  color: rgba(244, 237, 225, .55);
+  margin-bottom: clamp(1rem, 3vh, 2rem);
+}
+
+.m-h1, .m-h2 {
+  font-family: var(--type-display);
+  font-weight: 300;
+  line-height: calc(1.08 * var(--ck-line-height-mul));
+  letter-spacing: -.015em;
+  text-wrap: balance;
+}
+.m-h1 { font-size: calc(clamp(2.8rem, 11vw, 7rem) * var(--ck-text-scale)); }
+.m-h2 { font-size: calc(clamp(1.9rem, 5vw, 3.4rem) * var(--ck-text-scale)); }
+
+/* The lines she wrote to stand alone. The brief: "some words can stand
+   completely alone" — so they get their own size and their own air. */
+.m-say {
+  font-family: var(--type-display);
+  font-weight: 300;
+  font-size: calc(clamp(1.5rem, 4.2vw, 2.9rem) * var(--ck-text-scale));
+  line-height: calc(1.34 * var(--ck-line-height-mul));
+  color: var(--sand-pale);
+  text-wrap: balance;
+}
+
+.m-p {
+  font-size: calc(clamp(1rem, 1.5vw, 1.18rem) * var(--ck-text-scale));
+  line-height: calc(1.78 * var(--ck-line-height-mul));
+  color: rgba(244, 237, 225, .82);
+  max-width: 38rem;
+}
+
+/* Her fragment stacks — "Intimate. Sensual. Aesthetic." — one per line,
+   wide-tracked, quiet. Breath between the statements, not a list. */
+.m-frag {
+  font-size: calc(clamp(.98rem, 2vw, 1.16rem) * var(--ck-text-scale));
+  line-height: calc(1.95 * var(--ck-line-height-mul));
+  letter-spacing: .04em;
+  color: rgba(244, 237, 225, .74);
+}
+
+.m-inner > * + * { margin-top: clamp(1rem, 2.6vh, 1.9rem); }
+.m-inner > .m-say + .m-say { margin-top: clamp(.4rem, 1.2vh, .8rem); }
+
+em { font-style: italic; color: var(--sand); }
+
+/* ---------- Portrait slots ----------
+   Three frames, and only three, in her own stated rhythm:
+   LAUGHTER -> MOVEMENT -> STILLNESS. She has not sent them yet.
+
+   These render as designed, labelled voids rather than stock stand-ins, for
+   two reasons: the contract forbids passing other imagery off as her, and an
+   honest gap is the clearest possible brief back to her about what to shoot.
+   To fill one: add `style="background-image:url('img/...')"` to the .m-bg and
+   delete the .m-slot block. Nothing else changes. */
+.m-slot {
+  position: absolute; inset: 0; z-index: 0;
+  display: grid; align-items: end; justify-items: center;
+  padding-bottom: clamp(2rem, 7vh, 5rem);
+  background:
+    repeating-linear-gradient(135deg,
+      rgba(244,237,225,.028) 0 14px, transparent 14px 28px),
+    linear-gradient(155deg, var(--earth) 0%, var(--ink) 55%, var(--night) 100%);
+}
+.m-slot-note {
+  text-align: center;
+  padding: 2rem;
+  color: rgba(244, 237, 225, .5);
+  font-size: calc(.74rem * var(--ck-text-scale));
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  line-height: 2.4;
+}
+.m-slot-note b {
+  display: block;
+  font-family: var(--type-display);
+  font-weight: 300;
+  font-size: calc(1.7rem * var(--ck-text-scale));
+  letter-spacing: .06em;
+  text-transform: none;
+  color: rgba(244, 237, 225, .78);
+  margin-bottom: .75rem;
+}
+
+/* ---------- Links ---------- */
+.m-back, .m-cta {
+  display: inline-block;
+  padding: .85rem 2rem;
+  font-size: calc(.78rem * var(--ck-text-scale));
+  letter-spacing: .26em; text-transform: uppercase; text-decoration: none;
+  color: var(--sand-pale);
+  border: 1px solid rgba(244, 237, 225, .45);
+  border-radius: 2px;
+  background: rgba(20, 15, 10, .18);
+  transition: background .5s var(--ease), border-color .5s var(--ease), color .5s var(--ease);
+}
+.m-back:hover, .m-back:focus-visible, .m-cta:hover, .m-cta:focus-visible {
+  background: rgba(244, 237, 225, .92);
+  border-color: rgba(244, 237, 225, .92);
+  color: var(--ink);
+}
+
+/* Persistent way back to the retreat — her page is reachable directly, and a
+   visitor who lands here from a shared link needs a door into the journey. */
+.m-nav {
+  position: fixed; z-index: 20;
+  top: clamp(1rem, 3vh, 2rem); left: clamp(1rem, 3vw, 2.5rem);
+  font-size: calc(.7rem * var(--ck-text-scale));
+  letter-spacing: .24em; text-transform: uppercase; text-decoration: none;
+  color: rgba(244, 237, 225, .72);
+  mix-blend-mode: difference;
+}
+.m-nav:hover, .m-nav:focus-visible { color: var(--sand-pale); }
+
+@media (max-width: 640px) {
+  .m-inner > * + * { margin-top: clamp(.9rem, 2.2vh, 1.4rem); }
+  /* Copy spans the full width on a phone, so there is no "facing page" to hold
+     dark. Veil bottom-up instead, matching where the copy actually sits. */
+  .m-frame > .m-bg::after,
+  .m-frame.is-centred > .m-bg::after {
+    background: linear-gradient(to top,
+      rgba(16,12,8,.86) 0%, rgba(16,12,8,.72) 38%,
+      rgba(16,12,8,.44) 66%, rgba(16,12,8,.42) 100%);
+  }
+  .m-frame > .m-inner::before { inset: -2rem -1.75rem; }
+  .m-nav { mix-blend-mode: normal; text-shadow: 0 1px 12px rgba(16,12,8,.9); }
+}
+
+
+/* ---- Reading-panel type on the sand ground (22 Aug palette flip) ----
+   The .m-frame (photographic) panels keep their pale-on-dark treatment;
+   only panels sitting on paper are re-inked here. */
+.m-read .m-p     { color: var(--ink-soft); }
+.m-read .m-frag  { color: var(--ink-soft); }
+.m-read .m-say   { color: var(--ink); }
+.m-read .m-kicker{ color: var(--ink-faint); }
+.m-read em       { color: var(--earth); }
+.m-read .m-pull  { color: var(--ink); border-color: var(--rule); }
+.m-read a        { color: var(--earth); text-decoration-color: var(--rule); }
+.m-read a:hover, .m-read a:focus-visible { color: var(--fire); }
+
+
+/* ---- Hero → paper fade -----------------------------------------------
+   The transition Mehta named: on inclusifund.co.uk the hero photograph
+   dissolves into the page ground instead of ending on a hard edge.
+
+   NOTE FOR ANYONE EDITING THIS: `.m-frame > .m-bg::after` is ALREADY TAKEN
+   by the directional legibility veil above (line ~48). Reusing it here wiped
+   the veil and, because that rule sets `inset: 0`, the inherited `top: 0`
+   beat this block's `bottom: 0` and painted the band across the TOP of the
+   hero. Hence ::before for the blur, and an explicit `top: auto`.        */
+.m-frame { position: relative; }
+
+/* The soft band of paper at the foot of the panel. */
+.m-frame::after {
+  content: "";
+  position: absolute; left: 0; right: 0; top: auto; bottom: 0;
+  height: clamp(90px, 18vh, 190px);
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(to bottom,
+    rgba(240, 231, 216, 0) 0%,
+    rgba(240, 231, 216, .55) 55%,
+    var(--paper-edge) 100%);
+}
+
+/* The blur sits on the image layer, masked to the same band, so the photo
+   softens INTO the paper rather than being covered by it. ::before, so the
+   veil on ::after survives untouched. */
+.m-frame > .m-bg::before {
+  content: "";
+  position: absolute; left: 0; right: 0; top: auto; bottom: 0;
+  height: clamp(90px, 18vh, 190px);
+  z-index: 1;
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 80%);
+          mask-image: linear-gradient(to bottom, transparent 0%, #000 80%);
+  pointer-events: none;
+}
+
+/* A panel followed by another photograph shouldn't fade to paper — only the
+   image→text seams get the dissolve. */
+.m-frame.no-fade::after, .m-frame.no-fade > .m-bg::before { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .m-frame > .m-bg::before { backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+
+/* ---- Portrait hero on a landscape screen ------------------------------
+   Doryan's portrait is 3:4 and shot close. Full-bleed `cover` on a wide
+   viewport crops it to a face filling the screen — too loud for "one quiet
+   image". On landscape screens the hero becomes a spread instead: the
+   portrait held at its own proportions on the right, the name on the left.
+   Below 900px the panel is taller than it is wide, so cover behaves and the
+   original full-bleed treatment stands. */
+@media (min-width: 56rem) and (orientation: landscape) {
+  .m-panel.is-hero.is-portrait-hero > .m-bg {
+    left: auto; right: 0; width: min(46%, 34rem);
+  }
+  .m-panel.is-hero.is-portrait-hero > .m-bg::after {
+    background: linear-gradient(to right,
+      var(--paper) 0%, rgba(240,231,216,.55) 14%, rgba(16,12,8,0) 42%);
+  }
+  .m-panel.is-hero.is-portrait-hero {
+    background: var(--paper);
+    justify-items: start;
+    padding-right: min(50%, 38rem);
+  }
+  .m-panel.is-hero.is-portrait-hero .m-inner { text-align: left; }
+  /* The copy now sits on paper, not on the photograph, so the dark
+     legibility scrim behind it is not just unnecessary — it renders as a
+     smudge on the sand. Off. */
+  .m-panel.is-hero.is-portrait-hero > .m-inner::before { display: none; }
+  .m-panel.is-hero.is-portrait-hero .m-h1,
+  .m-panel.is-hero.is-portrait-hero .m-say { color: var(--ink); }
+}

@@ -1,0 +1,506 @@
+/* ============================================================
+   Calm Kit — persistent accessibility panel for InclusiFund
+   Designed once here. Lifted to /meta/shared/calm-kit/ later so
+   every InclusiFund surface (manifesto, tools, AIQ, community)
+   inherits the same kit and persisted user preferences.
+   ============================================================ */
+
+/* ---------- Fonts ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap');
+@import url('https://fonts.cdnfonts.com/css/open-dyslexic');
+
+/* ---------- CSS variables controlled by the kit ---------- */
+:root {
+  --ck-text-scale: 1;
+  --ck-line-height-mul: 1;
+  --ck-letter-spacing-add: 0em;
+
+  --ck-motion-scale: 1;     /* 0 = off, 0.35 = low, 1 = full */
+  --ck-motion-duration-mul: 1;
+  --ck-canvas-display: block;
+
+  --ck-accent: var(--terracotta, #C45A3D);
+  --ck-ink: var(--ink, #1F2420);
+  --ck-bg: var(--cream, #F5EFE6);
+
+  --ck-focus-ring: 2px solid currentColor;
+  --ck-focus-offset: 2px;
+}
+
+/* Apply scaling globally */
+html {
+  font-size: calc(100% * var(--ck-text-scale));
+}
+body {
+  line-height: calc(1.5 * var(--ck-line-height-mul));
+  letter-spacing: calc(var(--ck-letter-spacing-add));
+}
+
+/* ---------- Font swaps ---------- */
+html.ck-font-hyperlegible {
+  --type-serif: "Atkinson Hyperlegible", Georgia, serif;
+  --type-sans: "Atkinson Hyperlegible", system-ui, sans-serif;
+}
+html.ck-font-dyslexic {
+  --type-serif: "Open Dyslexic", "OpenDyslexic", Georgia, serif;
+  --type-sans: "Open Dyslexic", "OpenDyslexic", system-ui, sans-serif;
+  --ck-letter-spacing-add: 0.01em;
+  --ck-line-height-mul: 1.15;
+}
+
+/* ---------- Motion levels ---------- */
+html.ck-motion-off,
+html.ck-motion-off body {
+  --ck-motion-scale: 0;
+  --ck-motion-duration-mul: 0.001;
+  --ck-canvas-display: none;
+}
+html.ck-motion-off *,
+html.ck-motion-off *::before,
+html.ck-motion-off *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+html.ck-motion-off #circuit,
+html.ck-motion-off .particle-canvas {
+  display: none !important;
+}
+html.ck-motion-off .particle-fallback {
+  display: block !important;
+}
+
+html.ck-motion-low {
+  --ck-motion-scale: 0.35;
+  --ck-motion-duration-mul: 1.8;
+}
+html.ck-motion-low *,
+html.ck-motion-low *::before,
+html.ck-motion-low *::after {
+  animation-duration: 3s !important;
+  transition-duration: calc(var(--ck-motion-duration-mul) * 0.9s) !important;
+}
+
+/* ---------- Focus visibility ---------- */
+html.ck-focus-high *:focus-visible {
+  outline: 3px solid var(--terracotta, #C45A3D) !important;
+  outline-offset: 3px !important;
+  border-radius: 2px;
+}
+
+/* ---------- Contrast modes ---------- */
+html.ck-contrast-high {
+  --cream: #FFFFFF;
+  --cream-deep: #DFF0F4;
+  --ink: #04191F;
+  --ink-soft: #153543;
+  --terracotta: #08565A;
+  --forest: #0A8E85;
+  --forest-deep: #031A21;
+}
+/* Warm night — low-blue variant for users who find teal too cool at night */
+html.ck-contrast-low-blue {
+  --cream: #F6EFE0;
+  --cream-deep: #E9DEC6;
+  --ink: #2D241A;
+  --ink-soft: #4A3E2E;
+  --terracotta: #B8522F;
+  --forest: #7C8F3E;
+  --forest-deep: #2E3519;
+  --gold: #D9A360;
+  --gold-warm: #E8C48A;
+}
+
+/* ============================================================
+   Panel structure
+   ============================================================ */
+#calm-kit {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  font-family: var(--type-sans, system-ui, sans-serif);
+  pointer-events: none;
+}
+#calm-kit * { pointer-events: auto; }
+
+.ck-tab {
+  align-self: center;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  padding: 1rem 0.5rem;
+  background: rgba(245, 239, 230, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(31, 36, 32, 0.12);
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+  font-family: var(--type-sans, system-ui, sans-serif);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft, #3A413C);
+  cursor: pointer;
+  transition: background 0.25s ease, color 0.25s ease, padding-left 0.25s ease;
+  margin-right: -1px;
+}
+.ck-tab:hover {
+  background: rgba(245, 239, 230, 1);
+  color: var(--terracotta, #C45A3D);
+  padding-left: 0.75rem;
+}
+.ck-tab-icon {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--forest, #2F5D50);
+  box-shadow: 0 0 8px rgba(47, 93, 80, 0.6);
+  margin-bottom: 0.5rem;
+  writing-mode: horizontal-tb;
+}
+.ck-tab-label {
+  writing-mode: vertical-rl;
+}
+
+.ck-panel {
+  /* Absolute, not a flex item.
+     WHY: #calm-kit is a fixed, full-height flex row. As a flex item the closed
+     panel still claimed its 340px of width even though translateX(100%) had
+     moved it off-screen — so the container measured 371px wide and the tab, as
+     the first item, was pushed 339px in from the right edge and landed on top
+     of the page text (measured on the Practical section at 1280px and 1440px).
+     Taking it out of flow lets the container hug the tab. The slide-in is
+     unchanged: translateX(100%) -> translateX(0) against right: 0. */
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 340px;
+  max-width: 90vw;
+  height: 100%;
+  background: var(--cream, #F5EFE6);
+  border-left: 1px solid rgba(31, 36, 32, 0.1);
+  box-shadow: -20px 0 40px rgba(31, 36, 32, 0.08);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: hidden;
+}
+#calm-kit.is-open .ck-panel {
+  transform: translateX(0);
+}
+#calm-kit.is-open .ck-tab {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ck-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(31, 36, 32, 0.08);
+}
+.ck-head h2 {
+  font-family: var(--type-serif, Georgia, serif);
+  font-weight: 400;
+  font-size: 1.4rem;
+  letter-spacing: -0.01em;
+  color: var(--ink, #1F2420);
+  margin: 0;
+}
+.ck-close {
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--ink-soft, #3A413C);
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.ck-close:hover {
+  background: rgba(31, 36, 32, 0.06);
+  color: var(--terracotta, #C45A3D);
+}
+
+.ck-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.ck-body fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+.ck-body legend {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft, #3A413C);
+  margin-bottom: 0.5rem;
+  padding: 0;
+}
+
+.ck-seg {
+  display: flex;
+  gap: 0.25rem;
+  background: rgba(31, 36, 32, 0.05);
+  padding: 0.25rem;
+  border-radius: 8px;
+}
+.ck-seg button {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 0.55rem 0.5rem;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--ink-soft, #3A413C);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.ck-seg button:hover {
+  color: var(--ink, #1F2420);
+}
+.ck-seg button.is-active {
+  background: var(--cream, #F5EFE6);
+  color: var(--terracotta, #C45A3D);
+  box-shadow: 0 1px 3px rgba(31, 36, 32, 0.08);
+}
+
+.ck-preview {
+  background: rgba(31, 36, 32, 0.04);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  border-left: 3px solid var(--terracotta, #C45A3D);
+}
+.ck-preview-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft, #3A413C);
+  margin: 0 0 0.4rem;
+}
+.ck-preview-text {
+  font-family: var(--type-serif, Georgia, serif);
+  font-size: 1.05rem;
+  line-height: 1.4;
+  color: var(--ink, #1F2420);
+  margin: 0;
+  font-style: italic;
+}
+
+.ck-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid rgba(31, 36, 32, 0.08);
+  font-size: 0.78rem;
+  color: var(--ink-soft, #3A413C);
+}
+.ck-reset {
+  background: transparent;
+  border: 1px solid rgba(31, 36, 32, 0.18);
+  color: var(--ink, #1F2420);
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  font-family: inherit;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.ck-reset:hover {
+  background: var(--ink, #1F2420);
+  color: var(--cream, #F5EFE6);
+  border-color: var(--ink, #1F2420);
+}
+.ck-saved {
+  font-style: italic;
+  opacity: 0.7;
+}
+
+/* ---------- Dismiss × on the floating button (mobile only via @media below) ---------- */
+.ck-dismiss {
+  display: none;
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--ink, #1F2420);
+  color: #fff;
+  border: 2px solid var(--cream, #F5EFE6);
+  font-size: 15px;
+  line-height: 1;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  z-index: 2;
+  font-family: inherit;
+}
+.ck-dismiss:hover { background: var(--terracotta, #C45A3D); }
+
+/* ---------- Backdrop (mobile only via @media below) ---------- */
+.ck-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(31, 36, 32, 0.32);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+/* ---------- Restore pill — shown only when fully dismissed ---------- */
+.ck-restore {
+  display: none;
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(31, 36, 32, 0.55);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  font-size: 14px;
+  line-height: 1;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 999;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 0;
+  font-family: inherit;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.ck-restore:hover { background: var(--ink, #1F2420); transform: scale(1.06); }
+
+/* When dismissed: hide the whole kit, show the restore pill */
+body.ck-hidden #calm-kit { display: none; }
+body.ck-hidden .ck-restore { display: flex; }
+
+/* ---------- Mobile (≤768px) — sticky-mini + bottom-sheet panel ---------- */
+@media (max-width: 768px) {
+  /* Container shrinks to a corner anchor — frees the right edge for cards.
+     Stays a positioning context so .ck-dismiss can pin to its top-right. */
+  #calm-kit {
+    top: auto;
+    left: auto;
+    bottom: 16px;
+    right: 16px;
+    height: auto;
+    width: auto;
+    pointer-events: auto;
+    overflow: visible;
+  }
+
+  /* Tab → circular floating button (sticky-mini indicator) */
+  .ck-tab {
+    writing-mode: horizontal-tb;
+    transform: none;
+    width: 52px;
+    height: 52px;
+    padding: 0;
+    border-radius: 50%;
+    background: var(--terracotta, #C45A3D);
+    color: #fff;
+    border: 2px solid rgba(255, 255, 255, 0.45);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+    align-self: auto;
+    margin-right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .ck-tab:hover {
+    background: var(--terracotta, #C45A3D);
+    color: #fff;
+    padding: 0;
+  }
+  .ck-tab-label { display: none; }
+  .ck-tab-icon {
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.18);
+    margin: 0;
+  }
+
+  /* Reveal the dismiss × on mobile, pinned to the indicator's top-right */
+  .ck-dismiss { display: flex; }
+
+  /* Hide indicator + dismiss when the panel is open — header X / backdrop close it */
+  #calm-kit.is-open .ck-tab,
+  #calm-kit.is-open .ck-dismiss {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Panel becomes a bottom-sheet that slides up */
+  .ck-panel {
+    position: fixed;
+    top: auto;
+    inset: auto 0 0 0;
+    width: 100vw;
+    max-width: 100vw;
+    height: auto;
+    max-height: 80vh;
+    border-radius: 16px 16px 0 0;
+    border-left: none;
+    border-top: 1px solid rgba(31, 36, 32, 0.1);
+    box-shadow: 0 -12px 32px rgba(31, 36, 32, 0.16);
+    transform: translateY(100%);
+    z-index: 1001;
+  }
+  #calm-kit.is-open .ck-panel {
+    transform: translateY(0);
+  }
+
+  /* Backdrop visible on mobile when body has ck-open */
+  body.ck-open .ck-backdrop {
+    display: block;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .ck-body {
+    padding: 1rem 1.25rem;
+    gap: 0.9rem;
+  }
+
+  /* Slightly bigger restore pill on mobile so it's tappable */
+  .ck-restore {
+    width: 36px;
+    height: 36px;
+    bottom: 14px;
+    right: 14px;
+  }
+}

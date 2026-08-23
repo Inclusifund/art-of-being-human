@@ -347,7 +347,19 @@
 
   // Scroll driver height — one screen per beat
   const scroller = document.getElementById('scroll-driver');
-  scroller.style.height = `${totalBeats * 100}vh`;
+
+  // Height is measured in PIXELS, not vh. Mobile browsers change the value of
+  // 1vh every time the URL bar hides or reappears; across a 2300vh driver that
+  // resized the whole scroll mid-gesture and threw progress sideways — read by
+  // a reader as the page glitching and the words vanishing. Lock the pixel
+  // height, and only remeasure when the layout has genuinely changed: a width
+  // change, or a height change too large to be browser chrome.
+  let lockedW = window.innerWidth, lockedH = window.innerHeight;
+  const sizeDriver = () => {
+    scroller.style.height = `${totalBeats * window.innerHeight}px`;
+    lockedW = window.innerWidth; lockedH = window.innerHeight;
+  };
+  sizeDriver();
 
   // ---- Scroll → progress ----
   let progress = 0, rendered = 0, running = true, lastChapter = -1;
@@ -368,7 +380,12 @@
     progress = t * (totalBeats - 1);
   };
   window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', onScroll);
+  window.addEventListener('resize', () => {
+    // 120px of vertical movement with no width change is the URL bar, not a
+    // rotation or a resized window. Ignore it; remeasuring here is the bug.
+    if (window.innerWidth !== lockedW || Math.abs(window.innerHeight - lockedH) > 120) sizeDriver();
+    onScroll();
+  });
   onScroll();
 
   function scrollToBeat(idx) {
@@ -392,7 +409,13 @@
     if (motion === 'off') { requestAnimationFrame(frame); return; }
 
     // Slow on purpose. 0.055 reads as drift; anything near 0.2 reads as a slideshow.
-    rendered += (progress - rendered) * (motion === 'low' ? 0.10 : 0.055);
+    // But a fixed 0.055 also means a fast phone flick leaves `rendered` seconds
+    // behind the finger, so copy kept arriving for scroll that had already
+    // happened. Add a catch-up term proportional to how far behind it is: a
+    // slow scroll keeps the drift, a flick lands where the reader put it.
+    const behind = Math.abs(progress - rendered);
+    const follow = (motion === 'low' ? 0.10 : 0.055) + Math.min(0.28, behind * 0.55);
+    rendered += (progress - rendered) * follow;
 
     // --- Chapter image layers ---
     // Symmetric fading (both layers at ~0.5 mid-transition) double-exposed the
@@ -429,7 +452,18 @@
     // --- Beat copy: tighter cross-fade with a small parallax lift ---
     copies.forEach((el, i) => {
       const d = Math.abs(rendered - i);
-      const op = clamp01(1 - d * 2.2);   // matches the image dissolve rate above
+      // A rate of 2.2 made a beat's words visible only while d < 0.45 — so for
+      // 55% of every gap between beats NO copy was on screen at all, and the
+      // midpoint was reliably blank. Reported 23 Aug as "the text disappears
+      // after it appears", and it was doing exactly that.
+      //
+      // Text cannot cross-dissolve in place without turning to mud, so the two
+      // never overlap: each beat reaches zero at the midpoint and its neighbour
+      // takes over there. Smoothstep holds it perceptually solid for ~85% of
+      // the beat and spends the blankness in an instant at the handover instead
+      // of half the scroll.
+      const t = clamp01((0.5 - d) * 6.5);
+      const op = t * t * (3 - 2 * t);
       el.style.opacity = op.toFixed(3);
       el.style.visibility = op < 0.005 ? 'hidden' : 'visible';
       if (op > 0.005) {

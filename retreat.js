@@ -9,9 +9,9 @@
    lets the GPU composite it.
 
    BEATS, not slides. A chapter owns an image; a beat owns a screen of copy.
-   The sea chapter runs three beats over one seascape — sail, then moonrise,
-   then the night beat — because the direction doc is explicit that these are
-   "moments within the sea story", not chapters of their own.
+   The sea runs its own beats over one seascape, and the moon and the
+   following evening follow it as their own chapters — the direction doc
+   fixes that sequence and says it must not be rearranged.
 
    Pacing note: every rate here is deliberately slow. The brief asks for an
    exhale, and an exhale cannot be rushed by an easing curve.
@@ -19,50 +19,56 @@
 
 (() => {
 
-  // Chapter copy is VERBATIM from the client's WEB DIRECTION CREATION.md.
+  // Chapter copy is VERBATIM from the client's WEB DIRECTION CREATION doc.
   // The doc's Golden Rule — "whenever we are tempted to add more text: REMOVE IT"
   // — is the acceptance criterion for this file. Do not pad these lines.
+  //
+  // ORDER IS THE CLIENT'S, given in writing 24 Aug 01:16, and matches the
+  // direction doc section for section:
+  //   hero · invitation · why egypt · the journey · integration · red sea ·
+  //   full moon (past-life regression) · blue lotus (following evening) ·
+  //   final sunrise + dance · the experience · who this is for · meet the hosts
+  // The Anicca/Impermanence chapter that used to sit at 02 came from a
+  // different source doc (Extra details Mehta) and was removed at her
+  // instruction the same message — "the second page impermanence and 3rd
+  // anicca don't belong there". Its frames were reused, not deleted.
+  //
+  // WORDING: ceremonies are named by EXPERIENCE AND INTENTION — never by what
+  // is taken, how, or what it is supposed to do. That is the client's own rule,
+  // written 24 Aug, and ./check-compliance.sh enforces it on every deploy. The
+  // reasoning and the superseded wording are kept off the wire, in
+  // projects/mehta-retreat-2026-08-11/CEREMONY-WORDING-2026-08-20.md.
   const CHAPTERS = [
     {
-      num: '01', id: 'invitation', label: 'The Invitation',
+      num: '01', id: 'arrive', label: 'Arrive',
       img: 'img/01-invitation.jpg',
       alt: 'A lone figure in a vast landscape where desert meets sea at first light',
       tint: ['#E8DCC8', '#A89880', '#6B5844'],
       beats: [{
         title: 'The Art of Being Human',
-        meta: 'Egypt · November 18–28',
-        lines: ['Ten days to step outside the familiar.', 'To breathe.', 'To feel.', 'To remember.'],
-        cta: { label: 'Enter', href: '#ch-egypt' },
+        meta: 'Egypt · November 18–28, 2026',
+        lines: ['A 10-day journey into what it means to be human.'],
+        cta: { label: 'Enter', href: '#ch-invitation' },
         opening: true,
       }],
     },
     {
-      num: '02', id: 'anicca', label: 'Impermanence',
-      img: 'img/02a-nothing-stays.jpg',
-      alt: 'Moving water, its surface pulled into long soft streaks',
+      num: '02', id: 'invitation', label: 'The Invitation',
+      img: 'img/02c-everything-alive.jpg',
+      alt: 'A hand open underwater, reaching up toward the light',
       tint: ['#C9D3D6', '#6E7E86', '#212B31'],
       beats: [{
-        title: 'Nothing stays.',
-        lines: ['To be human is to live in a world', 'that is always changing.'],
-        soft: ['The desert changes with the light.', 'The moon moves through its cycle.',
-               'The tide comes and goes.', 'The body changes.',
-               'Relationships change.', 'We change.'],
+        title: 'What if you didn’t have to become anything?',
+        lines: ['What if you could simply arrive?'],
+        soft: ['With your light.', 'Your shadow.', 'Your questions.', 'Your contradictions.',
+               'Your pleasure.', 'Your grief.', 'Your laughter.'],
       }, {
-        img: 'img/02b-anicca.jpg',
-        pos: 'center 30%',
-        alt: 'A full moon half-veiled by cloud over dark water',
-        title: 'Anicca',
-        meta: 'Impermanence',
-        lines: ['Not as an idea to understand,', 'but as something to experience.'],
-        soft: ['An invitation to meet change', 'rather than resist it.'],
-      }, {
-        img: 'img/02c-everything-alive.jpg',
-        alt: 'A hand open underwater, reaching up toward the light',
-        lines: ['Nothing is fixed.', 'Nothing is promised.', 'Everything is alive.'],
+        lines: ['What if there was nothing to fix?', 'Only something to experience.'],
+        soft: ['An invitation to slow down, feel deeply', 'and meet yourself exactly where you are.'],
       }],
     },
     {
-      num: '03', id: 'egypt', label: 'Egypt',
+      num: '03', id: 'egypt', label: 'Why Egypt',
       img: 'img/02-egypt.jpg',
       alt: 'Ancient stone in raking Egyptian light, texture and shadow',
       tint: ['#E3A857', '#A8763F', '#4A3320'],
@@ -78,12 +84,12 @@
       }],
     },
     {
-      num: '04', id: 'desert', label: 'The Desert',
+      num: '04', id: 'desert', label: 'The Journey',
       img: 'img/03-desert.jpg',
       alt: 'Sinai mountains and open sand, immense and empty',
       tint: ['#D9B99B', '#9C7550', '#3E2C1E'],
       beats: [{
-        title: 'Into the Desert',
+        title: 'Three days in the desert.',
         lines: ['The world becomes quieter.'],
         soft: ['We walk.', 'We sleep in a cave.', 'We gather around the fire.'],
       }, {
@@ -95,19 +101,18 @@
       }],
     },
     {
-      num: '05', id: 'inward', label: 'The Inner Journey',
+      num: '05', id: 'ceremony', label: 'The Desert Ceremony',
       img: 'img/04-inner-journey.jpg',
       alt: 'Firelight on skin and hands, eyes closed, deliberately anonymous',
       tint: ['#C4622D', '#7A3418', '#20140C'],
       beats: [{
+        // Her sentence, near enough word for word, from the 24 Aug wording note.
         title: 'And then, we go inward.',
-        // Mehta's wording, given in writing 22 Aug 23:07. It replaces a phrase that
-        // gets a WeTravel/Stripe account suspended; the superseded wording lives in
-        // the project record, never in public source. Keep in sync with index.html.
-        soft: ['Movement.', 'Ceremony.', 'Nature\u2019s medicine.', 'Silence.'],
+        lines: ['As the afternoon unfolds,', 'we enter a carefully held desert ceremony.'],
+        soft: ['The vastness of the landscape.', 'The silence.', 'The setting sun.'],
       }, {
-        lines: ['Whatever is ready to be met,', 'we meet.'],
-        soft: ['Nothing to force.', 'Nothing to perform.', 'Just space.'],
+        lines: ['Space for a deeper encounter', 'with ourselves.'],
+        soft: ['Nothing to force.', 'Nothing to perform.', 'Whatever is ready to be met, we meet.'],
       }],
     },
     {
@@ -128,7 +133,7 @@
       }],
     },
     {
-      num: '07', id: 'sea', label: 'The Sea',
+      num: '07', id: 'sea', label: 'The Red Sea',
       img: 'img/06-sea.jpg',
       alt: 'The open Red Sea from the deck, turquoise water to the horizon',
       tint: ['#5DB6C4', '#1B4A5A', '#0A1F2A'],
@@ -138,22 +143,44 @@
         soft: ['We sail.', 'We swim.', 'We float.', 'We laugh.', 'We rest.'],
       }, {
         lines: ['And somewhere between the water and the sky,', 'time begins to disappear.'],
-      }, {
-        img: 'img/06b-full-moon.jpg',
-        pos: 'center 22%',
-        alt: 'A full moon over open sea, its light broken across the water',
-        title: 'The full moon rises.',
-        lines: ['We turn inward again.', 'We listen to what lies beneath the story we know.'],
-        soft: ['Then we look forward.', 'What do we want to create?'],
-      }, {
-        // A named substance was removed from this beat on 22 Aug at Mehta's written
-        // instruction (she is unsure it will be offered). The night beat stays; only
-        // the naming goes. One image in img/ is now unused as a result.
-        soft: ['Night comes.', 'Stillness.', 'Water.', 'Breath.'],
       }],
     },
     {
-      num: '08', id: 'sunrise', label: 'The Last Sunrise',
+      num: '08', id: 'fullmoon', label: 'The Full Moon',
+      img: 'img/06b-full-moon.jpg',
+      pos: 'center 22%',
+      alt: 'A full moon over open sea, its light broken across the water',
+      tint: ['#8FA6C4', '#33506E', '#0A1420'],
+      beats: [{
+        title: 'The full moon rises.',
+        lines: ['A past-life regression ceremony,', 'held on the water.'],
+        soft: ['We listen to what lies beneath', 'the story we know.'],
+      }, {
+        lines: ['Then we look forward.'],
+        soft: ['What do we want to create?'],
+      }],
+    },
+    {
+      num: '09', id: 'lotus', label: 'The Blue Lotus Ceremony',
+      // Deliberately NOT a second moon-over-water frame — chapter 08 already
+      // owns that image, and back to back the two nights read as a stall. This
+      // one is the source lotus frame graded down into the night palette
+      // (build step in the project record); the doc's "no stock wellness
+      // photography" rule is why the original saturated macro does not ship.
+      img: 'img/09-blue-lotus-night.jpg',
+      pos: '26% 34%',
+      alt: 'A blue lotus in near-darkness, its petals barely lit',
+      tint: ['#7E8FBE', '#2E3B63', '#0A0E1C'],
+      beats: [{
+        title: 'The following evening.',
+        lines: ['A Blue Lotus ceremony,', 'inspired by ancient Egyptian symbolism.'],
+        soft: ['The threshold between waking and dreaming.',
+               'A quiet space for inner listening,', 'imagination,',
+               'and the mysteries of the night.'],
+      }],
+    },
+    {
+      num: '10', id: 'sunrise', label: 'The Last Sunrise',
       img: 'img/07-last-sunrise.jpg',
       alt: 'Sunrise over the Red Sea, bodies moving on deck in first light',
       tint: ['#F2B45C', '#D4692E', '#3A1C10'],
@@ -172,7 +199,21 @@
       }],
     },
     {
-      num: '09', id: 'circle', label: 'The Human Circle',
+      num: '11', id: 'experience', label: 'The Experience',
+      img: 'img/02a-nothing-stays.jpg',
+      alt: 'Moving water, its surface pulled into long soft streaks',
+      tint: ['#C9D3D6', '#6E7E86', '#212B31'],
+      beats: [{
+        title: 'What it feels like to be there.',
+        soft: ['Space to breathe.', 'Time in nature.', 'Movement.', 'Connection.', 'Silence.',
+               'Laughter.', 'Deep conversations.', 'Fire.', 'Water.', 'The unknown.'],
+      }, {
+        lines: ['You don’t need to perform transformation.', 'You simply need to arrive.'],
+        soft: ['Moments of being held.', 'Moments of letting go.', 'Moments that cannot be planned.'],
+      }],
+    },
+    {
+      num: '12', id: 'circle', label: 'Who This Is For',
       img: 'img/08-human-circle.jpg',
       alt: 'The group together, unposed — laughing, resting, leaning in',
       tint: ['#E0C9AE', '#96725A', '#2E211A'],
@@ -188,7 +229,7 @@
       }],
     },
     {
-      num: '10', id: 'story', label: 'The Story',
+      num: '13', id: 'story', label: 'Meet Mehta & Doryan',
       img: 'img/09-the-story.jpg',
       alt: 'An unposed, personal portrait of Mehta',
       tint: ['#D6BFA8', '#8A6A52', '#2A1D15'],
@@ -203,19 +244,20 @@
       }],
     },
     {
-      num: '11', id: 'come', label: 'Come With Us',
+      num: '14', id: 'come', label: 'Come With Us',
       img: 'img/10-come-with-us.jpg',
       alt: 'A tiny figure walking away into an immense open landscape',
       tint: ['#EBD9C0', '#7E93A0', '#16222B'],
       beats: [{
-        title: 'Maybe this is your time.',
-        soft: ['To step away.', 'To breathe.', 'To feel.', 'To remember.'],
+        title: 'You don’t have to know exactly why you’re here.',
+        lines: ['You don’t have to have it figured out.'],
+        soft: ['Maybe something in you simply said:', 'Yes.', 'And maybe that’s enough.'],
       }, {
         soft: ['Ten days.', 'Desert.', 'Sea.', 'Fire.', 'Water.', 'Moonlight.', 'Sunrise.'],
-        lines: ['To love what is here', 'without needing it to stay.'],
       }, {
         title: 'The Art of Being Human',
         meta: 'Egypt · November 18–28, 2026',
+        lines: ['Come as you are.'],
         cta: { label: 'Come with us', href: '#enquire', primary: true },
         closing: true,
       }],
@@ -232,8 +274,8 @@
   const totalBeats = BEATS.length;
 
   // A chapter is a unit of NARRATIVE; a scene is a unit of PICTURE. They used to
-  // be the same thing, which meant the sea chapter showed one dolphin frame
-  // through its moonrise and blue-lotus beats. Beats may now carry their own
+  // be the same thing, which meant one chapter held one frame however many
+  // screens of copy ran over it. Beats may now carry their own
   // `img`, and consecutive beats sharing a frame collapse back into one scene —
   // so an unchanged chapter still costs exactly one layer, as before.
   const SCENES = [];
@@ -487,7 +529,7 @@
     requestAnimationFrame(frame);
   };
 
-  // ---- Keyboard: arrows step one BEAT, so the sea's moonrise is reachable ----
+  // ---- Keyboard: arrows step one BEAT, so every screen of copy is reachable ----
   document.addEventListener('keydown', (e) => {
     const cur = Math.round(rendered);
     if (e.key === 'ArrowDown' || e.key === 'PageDown') {

@@ -41,9 +41,9 @@
   const CHAPTERS = [
     {
       num: '01', id: 'arrive', label: 'Arrive',
-      img: 'img/01-invitation.jpg',
-      alt: 'A lone figure in a vast landscape where desert meets sea at first light',
-      tint: ['#E8DCC8', '#A89880', '#6B5844'],
+      img: 'img/01-dunes.jpg',
+      alt: 'Wind lifting off the crest of a dune, ridge behind ridge in warm light',
+      tint: ['#EFDCC6', '#A0785A', '#4A3220'],
       beats: [{
         title: 'The Art of Being Human',
         meta: 'Egypt · November 18–28, 2026',
@@ -54,9 +54,9 @@
     },
     {
       num: '02', id: 'invitation', label: 'The Invitation',
-      img: 'img/02c-everything-alive.jpg',
-      alt: 'A hand open underwater, reaching up toward the light',
-      tint: ['#C9D3D6', '#6E7E86', '#212B31'],
+      img: 'img/02d-fireside.jpg',
+      alt: 'A man kneeling to light a fire in the sand as the sky turns violet',
+      tint: ['#E9BE93', '#5D608A', '#171626'],
       beats: [{
         title: 'What if you didn’t have to become anything?',
         lines: ['What if you could simply arrive?'],
@@ -142,6 +142,8 @@
         lines: ['The Red Sea opens.'],
         soft: ['We sail.', 'We swim.', 'We float.', 'We laugh.', 'We rest.'],
       }, {
+        img: 'img/06d-dolphin.jpg',
+        alt: 'A dolphin turning below the surface, a swimmer above it in open blue water',
         lines: ['And somewhere between the water and the sky,', 'time begins to disappear.'],
       }],
     },

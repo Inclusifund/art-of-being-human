@@ -53,7 +53,8 @@
         title: 'The Art of Being Human',
         meta: 'Egypt · November 18–28, 2026',
         lines: ['A 10-day journey into what it means to be human.'],
-        cta: { label: 'Enter', href: '#ch-invitation' },
+        // Enter button removed 8 Sep 2026 on her review — the scroll cue is
+        // the only invitation the opening frame needs.
         opening: true,
       }],
     },
@@ -106,6 +107,9 @@
         alt: 'A lone acacia against the sun, low mountains behind it',
         lines: ['We let the desert do what it does.', "Strip away what isn't necessary."],
       }, {
+        // Was inheriting the chapter frame, so this read as a repeat of beat 1.
+        img: 'img/04c-nothing-to-prove.jpg',
+        alt: 'Range behind range at dusk, the desert going pink and violet to the horizon',
         lines: ['Nothing to prove.', 'Nowhere to rush.', 'Just here.'],
       }],
     },
@@ -126,29 +130,38 @@
     },
     {
       num: '06', id: 'integration', label: 'Integration',
-      img: 'img/05-integration.jpg',
-      alt: 'Steam, flowers on water and worn stone at the temazcal',
+      // Three frames of the oasis itself, supplied by her 8 Sep 2026. The third
+      // beat previously had no `img` and fell back to the chapter frame, so
+      // slides 1 and 3 were the same picture — the same fault as chapter 04.
+      img: 'img/06-malakot-day.jpg',
+      alt: 'Domed earth shelters and woven rugs around a fire pit, mountains behind',
       tint: ['#B2C9C4', '#5E8079', '#1C2E2C'],
       beats: [{
         title: 'Return to the body.',
-        lines: ['At Malakot,', 'we soften.'],
+        lines: ['At Malakot Mountain Oasis,', 'we soften.'],
         soft: ['We rebirth in the temazcal, the mother’s womb.'],
       }, {
-        img: 'img/05b-flowers.jpg',
-        alt: 'Flowers floating on still water at the temazcal',
+        img: 'img/06-malakot-ice.jpg',
+        alt: 'Ice floating in a cold plunge pool, a lantern and herbs set on the stone edge',
         soft: ['Heat.', 'Cold.', 'Water.', 'Flowers.', 'Fire.', 'Breath.'],
       }, {
+        img: 'img/06-malakot-night.jpg',
+        alt: 'The oasis at night — lanterns, a fire, the group gathered under stars',
         lines: ['We let the experience settle.', 'We integrate.', 'We come back.'],
       }],
     },
     {
       num: '07', id: 'sea', label: 'The Red Sea',
-      img: 'img/06-sea.jpg',
-      alt: 'The open Red Sea from the deck, turquoise water to the horizon',
+      img: 'img/07-wake.jpg',
+      alt: 'The wake of a boat running back to a flat horizon, open blue in every direction',
       tint: ['#5DB6C4', '#1B4A5A', '#0A1F2A'],
       beats: [{
         title: 'Then, the land disappears.',
         lines: ['The Red Sea opens.'],
+      }, {
+        // Split out 8 Sep 2026 so the chapter runs water, water, dolphin.
+        img: 'img/07-ocean-sunset.jpg',
+        alt: 'Low sun breaking through cloud over a calm open sea',
         soft: ['We sail.', 'We swim.', 'We float.', 'We laugh.', 'We rest.'],
       }, {
         img: 'img/06d-dolphin.jpg',
@@ -158,17 +171,26 @@
     },
     {
       num: '08', id: 'fullmoon', label: 'The Full Moon',
-      img: 'img/06b-full-moon.jpg',
-      pos: 'center 22%',
-      alt: 'A full moon over open sea, its light broken across the water',
+      // Copy is hers, from the THE FULL MOON section of her own timeline
+      // (8 Sep 2026), used verbatim and only broken into beats. One frame
+      // carries all three, at her request.
+      img: 'img/08-moon.jpg',
+      pos: 'center 26%',
+      alt: 'A full moon breaking through cloud, its light laid across open water',
       tint: ['#8FA6C4', '#33506E', '#0A1420'],
       beats: [{
         title: 'The full moon rises.',
-        lines: ['A past-life regression ceremony,', 'held on the water.'],
-        soft: ['We listen to what lies beneath', 'the story we know.'],
+        lines: ['Tonight, 24 November,', 'the full moon rises over the Red Sea.'],
+        soft: ['As the sun begins to set, we gather for a past-life regression',
+               'beneath the full moon.'],
       }, {
-        lines: ['Then we look forward.'],
-        soft: ['What do we want to create?'],
+        lines: ['A journey through memory, imagination, symbolism', 'and the deeper landscapes of the self.'],
+        soft: ['We allow the moon, the sea and the night', 'to hold the space.'],
+      }, {
+        lines: ['Whatever arises is yours to explore.'],
+        soft: ['A story.', 'An image.', 'A feeling.', 'A question.',
+               'Or simply a sense of mystery.', '',
+               'We don’t need to explain everything.', 'We simply listen.'],
       }],
     },
     {
@@ -204,7 +226,7 @@
       beats: [{
         title: 'And then, sunset.',
         lines: ['Our last evening at sea.'],
-        soft: ['Cacao.', 'Fresh fruit.', 'Music.', 'The last light.'],
+        soft: ['Cacao.', 'Music.', 'Fresh fruit.', 'The last light.'],
       }, {
         img: 'img/07b-we-dance.jpg',
         alt: 'Raised hands in silhouette against a burning sunset sky',
@@ -247,8 +269,13 @@
     },
     {
       num: '13', id: 'story', label: 'Meet Mehta & Trish',
-      img: 'img/mehta-trish.jpg',
-      alt: 'Mehta and Trish together, close and unposed, against desert rock',
+      // Cropped in from the full frame on her review, 8 Sep 2026 — "slide it
+      // down so both faces are there… zoom in to them and their warm smiles."
+      // Pinned to 33% so a laptop's letterbox crop lands on the two faces
+      // rather than centring blindly between them and the ground.
+      img: 'img/13-mehta-trish-faces.jpg',
+      pos: 'center 33%',
+      alt: 'Mehta and Trish together, leaning in, both smiling at the camera',
       tint: ['#D6BFA8', '#8A6A52', '#2A1D15'],
       beats: [{
         title: 'How this began',

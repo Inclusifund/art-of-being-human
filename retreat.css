@@ -395,6 +395,20 @@ html.no-js .fallback { display: block; }
 .cta-primary:hover, .cta-primary:focus-visible { background: var(--earth); border-color: var(--earth); }
 .cta-ghost { background: transparent; color: var(--ink); border: 1px solid var(--rule); }
 .cta-ghost:hover, .cta-ghost:focus-visible { border-color: var(--ink); }
+/* Both close buttons open the same WhatsApp inbox (see the note in
+   index.html), so this line is what tells a reader that is deliberate —
+   and it is the only place Trish's number is reachable from the main page. */
+.close-hosts {
+  margin: 1.4rem 0 0; text-align: center;
+  font-size: .85rem; line-height: 1.7; color: var(--ink-soft);
+}
+.close-hosts a {
+  color: var(--ink); text-decoration: none;
+  border-bottom: 1px solid var(--rule);
+  transition: border-color .25s var(--ease, ease);
+}
+.close-hosts a:hover, .close-hosts a:focus-visible { border-bottom-color: var(--ink); }
+
 .close-meta {
   margin: 3rem 0 0; font-size: .72rem; letter-spacing: .22em;
   text-transform: uppercase; color: var(--ink-faint);

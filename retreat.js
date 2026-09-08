@@ -41,9 +41,14 @@
   const CHAPTERS = [
     {
       num: '01', id: 'arrive', label: 'Arrive',
-      img: 'img/01-dunes.jpg',
-      alt: 'Wind lifting off the crest of a dune, ridge behind ridge in warm light',
-      tint: ['#EFDCC6', '#A0785A', '#4A3220'],
+      img: 'img/01-blue-lagoon.jpg',
+      alt: 'A turquoise bay held in bare desert mountains, the sun high over open sea',
+      // Portrait source in a full-bleed frame: on a landscape screen `cover`
+      // shows a horizontal band through the middle. Pinned just below centre
+      // so the band keeps the bay and the sea horizon and loses the loose
+      // foreground rock, which is the half that fights the opening copy.
+      pos: 'center 48%',
+      tint: ['#7FC4F0', '#4E93A6', '#5C4230'],
       beats: [{
         title: 'The Art of Being Human',
         meta: 'Egypt · November 18–28, 2026',
@@ -69,9 +74,13 @@
     },
     {
       num: '03', id: 'egypt', label: 'Why Egypt',
-      img: 'img/02-egypt.jpg',
-      alt: 'Ancient stone in raking Egyptian light, texture and shadow',
-      tint: ['#E3A857', '#A8763F', '#4A3320'],
+      img: 'img/03-karnak.jpg',
+      alt: 'Sunlight breaking low between the great carved columns of a temple hall, an obelisk standing beyond',
+      // The sunburst — the whole point of the frame — sits at roughly 78% of
+      // the image height, which a centred crop cuts off entirely on a laptop.
+      // Pinned low so the band keeps the sun, the obelisk and the paved floor.
+      pos: 'center 66%',
+      tint: ['#E8D2A8', '#A8763F', '#3E2A1A'],
       beats: [{
         title: 'Why Egypt?',
         lines: ['Some places you visit.', 'Some places you feel.', 'Egypt is one of them.'],
@@ -182,17 +191,23 @@
       }],
     },
     {
-      num: '10', id: 'sunrise', label: 'The Last Sunrise',
+      // Was 'The Last Sunrise' until 8 Sep 2026. Her own updated timeline heads
+      // this day THE FINAL SUNSET and closes it "as the sun sets over the Red
+      // Sea" — and the day now ends by turning for Hurghada, which only works
+      // at dusk. Everything else in her wording was already identical: cacao,
+      // fresh fruit, music, dancing. The id stays 'sunrise' so the #ch-sunrise
+      // anchor in any link she has already shared does not break.
+      num: '10', id: 'sunrise', label: 'The Final Sunset',
       img: 'img/07-last-sunrise.jpg',
-      alt: 'Sunrise over the Red Sea, bodies moving on deck in first light',
+      alt: 'Sunset over the Red Sea, bodies moving on deck in the last light',
       tint: ['#F2B45C', '#D4692E', '#3A1C10'],
       beats: [{
-        title: 'And then, sunrise.',
-        lines: ['Our last morning at sea.'],
-        soft: ['Cacao.', 'Fresh fruit.', 'Music.', 'The first light.'],
+        title: 'And then, sunset.',
+        lines: ['Our last evening at sea.'],
+        soft: ['Cacao.', 'Fresh fruit.', 'Music.', 'The last light.'],
       }, {
         img: 'img/07b-we-dance.jpg',
-        alt: 'Raised hands in silhouette against a burning sunrise sky',
+        alt: 'Raised hands in silhouette against a burning sunset sky',
         lines: ['And we dance.'],
         soft: ['Not because we have somewhere to go.', 'But because we are here.', 'Alive.', 'Together.'],
       }, {
@@ -231,9 +246,9 @@
       }],
     },
     {
-      num: '13', id: 'story', label: 'Meet Mehta & Doryan',
-      img: 'img/09-the-story.jpg',
-      alt: 'An unposed, personal portrait of Mehta',
+      num: '13', id: 'story', label: 'Meet Mehta & Trish',
+      img: 'img/mehta-trish.jpg',
+      alt: 'Mehta and Trish together, close and unposed, against desert rock',
       tint: ['#D6BFA8', '#8A6A52', '#2A1D15'],
       beats: [{
         title: 'How this began',
@@ -242,7 +257,7 @@
                'Connection. Women. Human. Culture.',
                'And the questions that keep bringing me deeper into what it means to be human.'],
         ctas: [{ label: 'Meet Mehta', href: 'mehta.html' },
-               { label: 'Meet Doryan', href: 'doryan.html' }],
+               { label: 'Meet Trish', href: 'trish.html' }],
       }],
     },
     {
@@ -367,7 +382,7 @@
     if (b.lines) parts.push(`<p class="ch-lines">${b.lines.map(esc).join('<br />')}</p>`);
     if (b.soft) parts.push(`<p class="ch-soft">${b.soft.map(esc).join('<br />')}</p>`);
     // A beat may carry one cta or several — the hosts beat offers two doors,
-    // per the direction doc's "Meet Mehta -> and Meet Doryan ->".
+    // per the direction doc's "Meet Mehta -> and the co-facilitator ->".
     const ctas = b.ctas || (b.cta ? [b.cta] : []);
     ctas.forEach((c) => parts.push(
       `<a class="ch-cta${c.primary ? ' is-primary' : ''}" href="${esc(c.href)}">${esc(c.label)}</a>`));

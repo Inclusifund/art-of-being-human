@@ -82,8 +82,7 @@ body.m-body.ck-motion-off, body.m-body.ck-motion-low { scroll-snap-type: none; }
 }
 
 /* ---------- Reading panels ---------- */
-/* Reading panels are PAPER, not night — the sand ground Mehta and Doryan
-   both asked for on 22 Aug. Type flips to ink so contrast survives the flip
+/* Reading panels are PAPER, not night — "the sand ground Mehta and her\n$1co-host both asked for on 22 Aug." Type flips to ink so contrast survives the flip
    (ink #2A2118 on paper #F0E7D8 is ~11.4:1, comfortably past WCAG AAA). */
 .m-read { background: var(--paper); color: var(--ink); }
 .m-read.is-night { background: var(--paper-warm); color: var(--ink); }
@@ -205,6 +204,16 @@ em { font-style: italic; color: var(--sand); }
   color: var(--ink);
 }
 
+/* Two doors now close each host page — WhatsApp first, then back to the
+   journey (8 Sep 2026). They are inline-block siblings with no margin of
+   their own, so without this they butt together; and on a narrow phone two
+   uppercase, wide-tracked buttons will not sit on one line at all. */
+.m-cta + .m-cta { margin-left: .75rem; }
+@media (max-width: 34rem) {
+  .m-cta { display: block; width: fit-content; margin-inline: auto; }
+  .m-cta + .m-cta { margin-left: auto; margin-top: .75rem; }
+}
+
 /* Persistent way back to the retreat — her page is reachable directly, and a
    visitor who lands here from a shared link needs a door into the journey. */
 .m-nav {
@@ -293,7 +302,7 @@ em { font-style: italic; color: var(--sand); }
 }
 
 /* ---- Portrait hero on a landscape screen ------------------------------
-   Doryan's portrait is 3:4 and shot close. Full-bleed `cover` on a wide
+   "A supplied portrait is close-cropped and is rarely\n   wider than it is tall. Full-bleed" `cover` on a wide
    viewport crops it to a face filling the screen — too loud for "one quiet
    image". On landscape screens the hero becomes a spread instead: the
    portrait held at its own proportions on the right, the name on the left.

@@ -146,6 +146,9 @@
         soft: ['Heat.', 'Cold.', 'Water.', 'Flowers.', 'Fire.', 'Breath.'],
       }, {
         img: 'img/06-malakot-night.jpg',
+        // The domes, the lanterns and the fire are all in the lower half; a
+        // centred crop lands on bare mountain. Pinned low, on her review.
+        pos: 'center 78%',
         alt: 'The oasis at night — lanterns, a fire, the group gathered under stars',
         lines: ['We let the experience settle.', 'We integrate.', 'We come back.'],
       }],

@@ -329,6 +329,35 @@ html.no-js .fallback { display: block; }
 }
 .sheet-p { color: var(--ink-soft); line-height: calc(1.7 * var(--ck-line-height-mul)); margin: 0 0 1.25rem; }
 
+/* ---- Price ------------------------------------------------------------
+   The only number on the site, and it sits at the end of the practical sheet
+   where a reader has just finished working out whether they can actually go.
+   Quiet, not a price tag: serif figure, hairline rule above, no badge and no
+   colour shouting. The deadline line is the one that has to be legible —
+   it is the reason to act now, and it expires on 20 October 2026. */
+.price-block {
+  margin: 3.5rem 0 0; padding: 2rem 0 0;
+  border-top: 1px solid var(--rule);
+}
+.price-kicker {
+  font-size: .7rem; letter-spacing: .3em; text-transform: uppercase;
+  color: var(--ink-faint); margin: 0 0 1rem;
+}
+.price-now { margin: 0 0 .75rem; display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap; }
+.price-fig {
+  font-family: var(--type-serif, Fraunces, Georgia, serif);
+  font-weight: 300; font-size: clamp(2.4rem, 6vw, 3.6rem);
+  line-height: 1; letter-spacing: -.02em; color: var(--ink);
+}
+.price-per { font-size: .95rem; color: var(--ink-soft); }
+.price-note, .price-then {
+  margin: 0 0 .4rem; color: var(--ink-soft);
+  line-height: calc(1.7 * var(--ck-line-height-mul));
+}
+.price-note strong { color: var(--fire); font-weight: 600; }
+.price-then { font-size: .92rem; color: var(--ink-faint); }
+.price-then strong { color: var(--ink-soft); font-weight: 500; }
+
 /* ---- Facts: label above value, so a long value never squeezes ---- */
 .fact-grid {
   display: grid;

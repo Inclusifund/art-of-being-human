@@ -204,6 +204,34 @@ em { font-style: italic; color: var(--sand); }
   color: var(--ink);
 }
 
+/* ---- Standing invitation band ----------------------------------------
+   A slim paper strip between panels carrying the one action these pages have.
+   Paper, not photograph, so it reads as a pause in the reading rather than
+   another frame competing with her writing. `.m-cta` is built for dark
+   full-bleed panels — light type on a translucent dark ground — which is
+   invisible on paper, hence the ink variant below. */
+.m-invite {
+  background: var(--paper);
+  padding: clamp(2.5rem, 7vh, 4rem) 1.5rem;
+  text-align: center;
+}
+.m-invite-p {
+  margin: 0 0 1.5rem;
+  font-size: calc(.95rem * var(--ck-text-scale));
+  color: var(--ink-soft);
+  line-height: calc(1.6 * var(--ck-line-height-mul));
+}
+.m-cta.is-ink {
+  color: var(--ink);
+  border-color: rgba(42, 33, 24, .35);
+  background: transparent;
+}
+.m-cta.is-ink:hover, .m-cta.is-ink:focus-visible {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+
 /* Two doors now close each host page — WhatsApp first, then back to the
    journey (8 Sep 2026). They are inline-block siblings with no margin of
    their own, so without this they butt together; and on a narrow phone two

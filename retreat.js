@@ -182,7 +182,7 @@
       alt: 'A full moon breaking through cloud, its light laid across open water',
       tint: ['#8FA6C4', '#33506E', '#0A1420'],
       beats: [{
-        title: 'Full Moon Ceremony',
+        title: 'Full Moon',
         lines: ['We gather for a Past Life Regression Ceremony,', 'beneath the full moon.'],
         soft: ['The full moon rises over the Red Sea', 'as the sun begins to set.'],
       }, {

@@ -329,6 +329,31 @@ html.no-js .fallback { display: block; }
 }
 .sheet-p { color: var(--ink-soft); line-height: calc(1.7 * var(--ck-line-height-mul)); margin: 0 0 1.25rem; }
 
+/* ---- Mandatory notices -------------------------------------------------
+   Three things on this page can end someone's retreat at the airport: the
+   open-jaw ticket, the offshore insurance clause and the full Egyptian visa.
+   They are not decoration and they must not read as decoration — a left rule
+   in the fire colour, a title, and body type that stays the same size as
+   everything else so it reads as fact rather than as a banner someone has
+   learned to skip. */
+.must {
+  margin: 2.5rem 0;
+  padding: 1.25rem 0 1.25rem 1.25rem;
+  border-left: 3px solid var(--fire);
+}
+.must-title {
+  margin: 0 0 .6rem;
+  font-size: .78rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--fire); font-weight: 600;
+}
+.must p:not(.must-title) {
+  margin: 0 0 .7rem;
+  color: var(--ink-soft);
+  line-height: calc(1.7 * var(--ck-line-height-mul));
+}
+.must p:last-child { margin-bottom: 0; }
+.must strong { color: var(--ink); font-weight: 600; }
+
 /* ---- Price ------------------------------------------------------------
    The only number on the site, and it sits at the end of the practical sheet
    where a reader has just finished working out whether they can actually go.
@@ -357,6 +382,13 @@ html.no-js .fallback { display: block; }
 .price-note strong { color: var(--fire); font-weight: 600; }
 .price-then { font-size: .92rem; color: var(--ink-faint); }
 .price-then strong { color: var(--ink-soft); font-weight: 500; }
+.price-cancel {
+  margin: 1.5rem 0 0; padding-top: 1.25rem;
+  border-top: 1px solid var(--rule);
+  font-size: .88rem; color: var(--ink-faint);
+  line-height: calc(1.7 * var(--ck-line-height-mul));
+}
+.price-cancel strong { color: var(--ink-soft); font-weight: 600; }
 
 /* ---- Facts: label above value, so a long value never squeezes ---- */
 .fact-grid {

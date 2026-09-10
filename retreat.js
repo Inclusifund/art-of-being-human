@@ -182,10 +182,9 @@
       alt: 'A full moon breaking through cloud, its light laid across open water',
       tint: ['#8FA6C4', '#33506E', '#0A1420'],
       beats: [{
-        title: 'The full moon rises.',
-        lines: ['Tonight, 24 November,', 'the full moon rises over the Red Sea.'],
-        soft: ['As the sun begins to set, we gather for a past-life regression',
-               'beneath the full moon.'],
+        title: 'Full Moon Ceremony',
+        lines: ['We gather for a Past Life Regression Ceremony,', 'beneath the full moon.'],
+        soft: ['The full moon rises over the Red Sea', 'as the sun begins to set.'],
       }, {
         lines: ['A journey through memory, imagination, symbolism', 'and the deeper landscapes of the self.'],
         soft: ['We allow the moon, the sea and the night', 'to hold the space.'],
@@ -595,8 +594,32 @@
     if (ch) { e.preventDefault(); scrollToBeat(ch.start); }
   });
 
+  // Arriving from a host page's "Return to the journey" link, which points at
+  // index.html#ch-story. The click handler above only catches anchors clicked
+  // ON this page; a cross-page navigation lands with the hash already in the
+  // URL and nothing had ever read it, so every one of those links quietly
+  // dropped the reader back at the hero. No animation — arriving part-way
+  // through the journey should simply BE there, not scroll past ten chapters.
+  const openHash = () => {
+    const m = (location.hash || '').match(/^#ch-(.+)$/);
+    if (!m) return;
+    const ch = CHAPTERS.find((c) => c.id === m[1]);
+    if (!ch) return;
+    if (getMotion() === 'off') {
+      // The scroll engine is off and the static fallback is the visible
+      // surface, so move to ITS copy of the chapter instead. The fallback
+      // carries `f-` ids, not `ch-` ones, because the stage already owns
+      // `ch-<id>` and two elements cannot share an id.
+      const el = document.getElementById('f-' + ch.id);
+      if (el) el.scrollIntoView();
+      return;
+    }
+    window.scrollTo({ top: (ch.start / (totalBeats - 1)) * driverRange(), behavior: 'auto' });
+  };
+
   const boot = () => {
     motion = getMotion();
+    openHash();
     onScroll();
     rendered = progress;
     if (motion !== 'off') frame();
